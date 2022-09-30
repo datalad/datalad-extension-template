@@ -7,7 +7,10 @@
 
 import argparse
 import datetime
+import os
 import re
+import time
+from textwrap import wrap
 
 
 class ManPageFormatter(argparse.HelpFormatter):
@@ -24,7 +27,7 @@ class ManPageFormatter(argparse.HelpFormatter):
                  authors=None,
                  version=None
                  ):
-
+        from datalad import cfg
         super(ManPageFormatter, self).__init__(
             prog,
             indent_increment=indent_increment,
@@ -33,7 +36,9 @@ class ManPageFormatter(argparse.HelpFormatter):
 
         self._prog = prog
         self._section = 1
-        self._today = datetime.date.today().strftime('%Y\\-%m\\-%d')
+        self._today = datetime.datetime.utcfromtimestamp(
+            cfg.obtain('datalad.source.epoch')
+        ).strftime('%Y\\-%m\\-%d')
         self._ext_sections = ext_sections
         self._version = version
 
@@ -75,7 +80,7 @@ class ManPageFormatter(argparse.HelpFormatter):
 
     def _mk_name(self, prog, desc):
         """
-        this method is in consitent with others ... it relies on
+        this method is in consistent with others ... it relies on
         distribution
         """
         desc = desc.splitlines()[0] if desc else 'it is in the name'
@@ -195,7 +200,9 @@ class RSTManPageFormatter(ManPageFormatter):
                                    parser._mutually_exclusive_groups, '')
 
         usage = usage.replace('%s ' % self._prog, '')
-        usage = 'Synopsis\n--------\n::\n\n  %s %s\n' \
+        usage = '\n'.join(wrap(
+            usage, break_on_hyphens=False, subsequent_indent=6*' '))
+        usage = 'Synopsis\n--------\n::\n\n  %s %s\n\n' \
                 % (self._markup(self._prog), usage)
         return usage
 
@@ -251,7 +258,7 @@ class RSTManPageFormatter(ManPageFormatter):
 
     def _format_action(self, action):
         # determine the required width and the entry label
-        action_header = self._format_action_invocation(action)
+        action_header = self._format_action_invocation(action, doubledash='-\\\\-')
 
         if action.help:
             help_text = self._expand_help(action)
