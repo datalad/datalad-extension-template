@@ -53,6 +53,7 @@ class HelloWorld(Interface):
     # signature must match parameter list above
     # additional generic arguments are added by decorators
     def __call__(language: str = 'en') -> Iterator[dict]:
+        msg: str | tuple[str, ...]
         if language == 'en':
             msg = 'Hello!'
         elif language == 'de':
