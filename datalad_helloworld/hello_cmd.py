@@ -1,7 +1,10 @@
 """DataLad demo command"""
 
+from __future__ import annotations
+
 __docformat__ = 'restructuredtext'
 
+from collections.abc import Iterator
 from os.path import curdir
 from os.path import abspath
 
@@ -49,7 +52,7 @@ class HelloWorld(Interface):
     @eval_results
     # signature must match parameter list above
     # additional generic arguments are added by decorators
-    def __call__(language='en'):
+    def __call__(language: str = 'en') -> Iterator[dict]:
         if language == 'en':
             msg = 'Hello!'
         elif language == 'de':
