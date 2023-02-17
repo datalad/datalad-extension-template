@@ -41,6 +41,8 @@ adjust as necessary. A good approach is to
   "Auto-release on PR merge" workflows by using the code in the
   `datalad/release-action` repository [as described in its
   README](https://github.com/datalad/release-action#command-labels).
+- (Optionally) adjust [`tox.ini`](./tox.ini) for `pytest` and `flake8` options
+  and `tox` environments to use.
 
 You can consider filling in the provided [.zenodo.json](.zenodo.json) file with
 contributor information and [meta data](https://developers.zenodo.org/#representation)
