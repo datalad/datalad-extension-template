@@ -9,6 +9,17 @@ It is currently under development.
 API
 ===
 
+DataLad-ria Guides
+------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   quickstart.rst
+   design.rst
+   usage_examples.rst
+   for_admins.rst
+
 High-level API commands
 -----------------------
 
