@@ -1,8 +1,9 @@
-DataLad extension template
-**************************
+DataLad-ria extension
+*********************
 
-This is a template for creating a `DataLad <http://datalad.org>`__ extension
-that equips DataLad with additional functionality.
+This is a DataLad extension with modernized replacements for the RIA functionality
+in DataLad versions 0.13-0.19.X.
+It is currently under development.
 
 
 API
