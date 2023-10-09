@@ -11,21 +11,19 @@ API
 High-level API commands
 -----------------------
 
-.. currentmodule:: datalad.api
-.. autosummary::
-   :toctree: generated
+.. toctree::
+   :maxdepth: 2
 
-   hello_cmd
+   python_reference.rst
 
 
 Command line reference
 ----------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   generated/man/datalad-hello-cmd
-
+   cli_reference.rst
 
 Indices and tables
 ==================
