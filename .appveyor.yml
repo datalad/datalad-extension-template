@@ -172,6 +172,15 @@ install:
   #- sh: "[ -f ${HOME}/dlinstaller_env.sh ] && . ${HOME}/dlinstaller_env.sh || true"
 
 
+# only run the CI if there are code changes, tooling changes,
+# or changes in `.appveyor.yml`
+only_commits:
+  files:
+    - .appveyor.yml
+    - datalad_helloworld/
+    - tools/
+
+
 #before_build:
 #
 
