@@ -2,19 +2,15 @@
 
 __docformat__ = 'restructuredtext'
 
-from os.path import curdir
-from os.path import abspath
-
-from datalad.interface.base import Interface
-from datalad.interface.base import build_doc
-from datalad.support.param import Parameter
-from datalad.distribution.dataset import datasetmethod
-from datalad.interface.base import eval_results
-from datalad.support.constraints import EnsureChoice
-
-from datalad.interface.results import get_status_dict
-
 import logging
+from os.path import abspath, curdir
+
+from datalad.distribution.dataset import datasetmethod
+from datalad.interface.base import Interface, build_doc, eval_results
+from datalad.interface.results import get_status_dict
+from datalad.support.constraints import EnsureChoice
+from datalad.support.param import Parameter
+
 lgr = logging.getLogger('datalad.helloworld.hello_cmd')
 
 

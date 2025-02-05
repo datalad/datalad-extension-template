@@ -3,6 +3,7 @@
 __docformat__ = 'restructuredtext'
 
 import logging
+
 lgr = logging.getLogger('datalad.helloworld')
 
 # Defines a datalad command suite.
@@ -27,4 +28,5 @@ command_suite = (
 )
 
 from . import _version
+
 __version__ = _version.get_versions()['version']

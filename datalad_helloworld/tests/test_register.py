@@ -8,4 +8,3 @@ def test_register():
         da.hello_cmd(),
         1,
         action='demo')
-

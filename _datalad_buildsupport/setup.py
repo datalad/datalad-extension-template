@@ -8,11 +8,9 @@
 
 import datetime
 import os
+from os.path import dirname
+from os.path import join as opj
 
-from os.path import (
-    dirname,
-    join as opj,
-)
 from setuptools import Command, DistutilsOptionError
 from setuptools.config import read_configuration
 
@@ -176,8 +174,8 @@ class BuildConfigInfo(Command):
         if not os.path.exists(opath):
             os.makedirs(opath)
 
-        from datalad.interface.common_cfg import definitions as cfgdefs
         from datalad.dochelpers import _indent
+        from datalad.interface.common_cfg import definitions as cfgdefs
 
         categories = {
             'global': {},
