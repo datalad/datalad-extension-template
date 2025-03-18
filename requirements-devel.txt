@@ -1,7 +1,13 @@
 # requirements for a development environment
+coverage
+datalad
+datalad-core @ git+https://github.com/datalad/datalad-core
+datalad-next
+datasalad
+hatch
+hatch-vcs
 pytest
 pytest-cov
-coverage
 
 # requirements for a document building
 sphinx
