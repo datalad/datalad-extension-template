@@ -41,7 +41,7 @@
 #     will run until the file is removed (or 60 min have passed)
 #
 #   - in a terminal execute, for example, `C:\datalad_debug.bat 39` to set up the
-#     environment to debug in a Python 3.8 session (should generally match the
+#     environment to debug in a Python 3.9 session (should generally match the
 #     respective CI run configuration).
 
 
@@ -80,7 +80,7 @@ environment:
     - ID: MacP38core
       DTS: datalad_helloworld
       APPVEYOR_BUILD_WORKER_IMAGE: macos-monterey
-      PY: 3.8
+      PY: 3.9
       INSTALL_GITANNEX: git-annex
       DATALAD_LOCATIONS_SOCKETS: /Users/appveyor/DLTMP/sockets
       CODECOV_BINARY: https://uploader.codecov.io/latest/macos/codecov
