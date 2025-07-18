@@ -159,7 +159,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
 
         # Get the download link for the requested file
         download_url = self._get_download_link(
-            cleaned_url=from_url,
+            from_url=from_url,
             share_auth=share_auth,
             path=url_parts.path
         )
@@ -256,7 +256,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
 
     def _get_download_link(
         self,
-        cleaned_url: str,
+        from_url: str,
         share_auth: str,
         path: str
     ) -> str:
@@ -272,11 +272,11 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
 
         if result.status_code != 200:
             message = (
-                f'failed to get download link for {cleaned_url}, '
+                f'failed to get download link for {from_url}, '
                 f'server replied with status code: {result.status_code}.'
             )
             raise UrlOperationsAuthenticationError(
-                url=cleaned_url,
+                url=from_url,
                 message=message,
                 status_code=result.status_code
             )
