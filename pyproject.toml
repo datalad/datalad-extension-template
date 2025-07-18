@@ -68,7 +68,7 @@ Source = "https://github.com/datalad/datalad-remake"
 Changelog = "https://github.com/datalad/datalad-remake/blob/main/CHANGELOG.md"
 
 [project.scripts]
-git-annex-remote-datalad-remake = "datalad_publicneuro.annexremotes.remake_remote:main"
+git-annex-remote-uncurl-publicneuro = "datalad_publicneuro.annexremotes.uncurl_publicneuro:main"
 
 [project.entry-points."datalad.extensions"]
 remake = "datalad_publicneuro:command_suite"

@@ -18,7 +18,7 @@ import shutil
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 from urllib.parse import (
     unquote_plus,
     urlparse,
@@ -68,11 +68,12 @@ class PublicNeuroAuth(DataladAuth):
         self.publicneuro_username = publicneuro_username
 
     def handle_401(self, r, **kwargs):
-        r.headers['www-authenticate'] = (
-            'Basic '
-            'realm="datacatalog.publicneuro.eu", '
-            'charset="UTF-8"'
-        )
+        if 'www-authenticate' not in r.headers:
+            r.headers['www-authenticate'] = (
+                'Basic '
+                'realm="datacatalog.publicneuro.eu", '
+                'charset="UTF-8"'
+            )
         return super().handle_401(r, **kwargs)
 
     def _authenticated_rerequest(
@@ -100,6 +101,14 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
     ):
         self.download_info: dict[str, Any] = {}
         super().__init__(cfg=cfg, headers=headers)
+
+    def stat(self,
+         url: str,
+         *,
+         credential: str | None = None,
+         timeout: float | None = None
+    ) -> Dict:
+        return {}
 
     def download(self,
         from_url: str,
