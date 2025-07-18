@@ -8,15 +8,16 @@
 
 import datetime
 import os
-
 from os.path import (
     dirname,
+)
+from os.path import (
     join as opj,
 )
-from setuptools import Command, DistutilsOptionError
-from setuptools.config import read_configuration
 
 import versioneer
+from setuptools import Command, DistutilsOptionError
+from setuptools.config import read_configuration
 
 from . import formatters as fmt
 
@@ -176,8 +177,8 @@ class BuildConfigInfo(Command):
         if not os.path.exists(opath):
             os.makedirs(opath)
 
-        from datalad.interface.common_cfg import definitions as cfgdefs
         from datalad.dochelpers import _indent
+        from datalad.interface.common_cfg import definitions as cfgdefs
 
         categories = {
             'global': {},
@@ -189,7 +190,7 @@ class BuildConfigInfo(Command):
             categories[v.get('destination', 'misc')][term] = v
 
         for cat in categories:
-            with open(opj(opath, '{}.rst.in'.format(cat)), 'w') as rst:
+            with open(opj(opath, f'{cat}.rst.in'), 'w') as rst:
                 rst.write('.. glossary::\n')
                 for term, v in sorted(categories[cat].items(), key=lambda x: x[0]):
                     rst.write(_indent(term, '\n  '))
