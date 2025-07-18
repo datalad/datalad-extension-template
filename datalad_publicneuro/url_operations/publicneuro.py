@@ -14,6 +14,7 @@ The handler does not support stat operations.
 """
 from __future__ import annotations
 
+import re
 import shutil
 import tarfile
 import tempfile
@@ -40,6 +41,8 @@ from datalad_next.utils.requests_auth import _get_renewed_request
 get_share_link_url = 'https://datacatalog.publicneuro.eu/api/get_share_link/'
 prepare_url = 'https://delphiapp.computerome.dk/project_management/file_management/download/prepare'
 
+encoding_pattern = re.compile('charset="([a-zA-Z0-9-]+)"')
+
 
 class PublicNeuroAuth(DataladAuth):
     """Implement PublicnEUro specific authentication
@@ -61,19 +64,28 @@ class PublicNeuroAuth(DataladAuth):
     def __init__(
         self,
         cfg: ConfigManager,
+        dataset_id: str,
         credential: str | None = None,
-        publicneuro_username: str | None = None,
     ):
         super().__init__(cfg=cfg, credential=credential)
-        self.publicneuro_username = publicneuro_username
+        self.dataset_id = dataset_id
+        self.credential_encoding = 'latin-1'
 
     def handle_401(self, r, **kwargs):
         if 'www-authenticate' not in r.headers:
             r.headers['www-authenticate'] = (
                 'Basic '
-                'realm="datacatalog.publicneuro.eu", '
+                f'realm="datacatalog.publicneuro.eu/{self.dataset_id}", '
                 'charset="UTF-8"'
             )
+            self.credential_encoding = 'utf-8'
+        else:
+            # Isolate encoding from the header
+            match = encoding_pattern.match(r.headers['www-authenticate'])
+            if match:
+                self.credential_encoding = match.group(1).tolower()
+            else:
+                self.credential_encoding = 'latin-1'
         return super().handle_401(r, **kwargs)
 
     def _authenticated_rerequest(
@@ -82,10 +94,10 @@ class PublicNeuroAuth(DataladAuth):
             auth: requests.auth.AuthBase,
             **kwargs
     ) -> requests.models.Response:
-        """ Override base class method and add UTF-8 encoding"""
+        """ Override base class method and perform the correct encoding"""
         prep = _get_renewed_request(response)
-        auth.username = auth.username.encode('utf-8')
-        auth.password = auth.password.encode('utf-8')
+        auth.username = auth.username.encode(self.credential_encoding)
+        auth.password = auth.password.encode(self.credential_encoding)
         auth(prep)
         _r = response.connection.send(prep, **kwargs)
         _r.history.append(response)
@@ -118,7 +130,6 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         hash: list[str] | None = None,
         timeout: float | None = None
     ) -> dict:
-
         url_parts = urlparse(from_url)
         if not url_parts.scheme.startswith('publicneuro+'):
             message = f'URL scheme {url_parts.scheme!r} is not supported by {type(self)}.'
@@ -129,11 +140,21 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
 
         # Get authentication info for the dataset
         dataset_id = url_parts.netloc
-        auth = PublicNeuroAuth(cfg=self.cfg, credential=credential)
+        auth = PublicNeuroAuth(
+            cfg=self.cfg,
+            dataset_id=dataset_id,
+            credential=credential,
+        )
         share_auth = self._get_authentication_info(
             from_url=from_url,
             dataset_id=dataset_id,
             auth=auth,
+        )
+
+        # Authentication and authorization succeeded, save the credentials.
+        auth.save_entered_credential(
+            suggested_name=f'publicneuro',
+            context='PublicnEUro.eu',
         )
 
         # Get the download link for the requested file
