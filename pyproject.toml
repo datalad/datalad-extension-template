@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 [project]
 name = "datalad-publicneuro"
 dynamic = ["version"]
-description = ''
+description = 'A DataLad extension that simplifies access to PublicnEUro datasets'
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
@@ -44,7 +44,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-# This section is required to allow the direct refernces to the `datalad_core`
+# This section is required to allow the direct references to `datalad_core`
 # in the dependencies section below and in
 # `tool.hatch.envs.hatch-test.extra_dependencies`. Remove the section
 # `tool.hatch.metadata` when `datalad_core` is available on PyPI.
@@ -61,29 +61,21 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/datalad/datalad-remake"
-Documentation = "https://github.com/datalad/datalad-remake#readme"
-Issues = "https://github.com/datalad/datalad-remake/issues"
-Source = "https://github.com/datalad/datalad-remake"
-Changelog = "https://github.com/datalad/datalad-remake/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/datalad/datalad-publicneuro"
+Documentation = "https://github.com/datalad/datalad-publicneuro#readme"
+Issues = "https://github.com/datalad/datalad-publicneuro/issues"
+Source = "https://github.com/datalad/datalad-publicneuro"
+Changelog = "https://github.com/datalad/datalad-publicneuro/blob/main/CHANGELOG.md"
 
 [project.scripts]
 git-annex-remote-uncurl-publicneuro = "datalad_publicneuro.annexremotes.uncurl_publicneuro:main"
 
-[project.entry-points."datalad.extensions"]
-remake = "datalad_publicneuro:command_suite"
-
 [tool.hatch.version]
-source = "vcs"
+path = "datalad_publicneuro/__about__.py"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "datalad_publicneuro/_version.py"
-
-[tool.hatch.envs.hatch-test]
+[tool.hatch.envs.tests]
 default-args = ["datalad_publicneuro"]
 extra-dependencies = [
-    "datalad_next",
-    "datalad_core @ git+https://github.com/datalad/datalad-core",
     "hypothesis",
     "pytest",
     # if you come here, because coverage combination crashed for you
@@ -96,9 +88,9 @@ extra-dependencies = [
 [tool.hatch.envs.hatch-test.env-vars]
 DATALAD_EXTENSIONS_LOAD = "next"
 
-[tool.hatch.envs.tests]
-description = "run tests across Python versions"
-template = "hatch-test"
+#[tool.hatch.envs.tests]
+#description = "run tests across Python versions"
+#template = "hatch-test"
 
 [[tool.hatch.envs.tests.matrix]]
 python = ["3.9", "3.10", "3.11", "3.12"]
