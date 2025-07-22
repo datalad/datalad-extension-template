@@ -119,15 +119,82 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         self.download_info: dict[str, Any] = {}
         super().__init__(cfg=cfg, headers=headers)
 
-    def stat(self,
-         url: str,  # noqa: ARG002
-         *,
-         credential: str | None = None,  # noqa: ARG002
-         timeout: float | None = None,  # noqa: ARG002
+    def stat(
+        self,
+        url: str,  # noqa: ARG002
+        *,
+        credential: str | None = None,  # noqa: ARG002
+        timeout: float | None = None,  # noqa: ARG002
     ) -> dict:
-        return {}
 
-    def download(self,
+        dataset_id, path = self._process_url(url)
+        publicneuro_auth = self._authenticate(
+            from_url=url,
+            dataset_id=dataset_id,
+            credential=credential,
+            timeout=timeout,
+        )
+
+        return self._get_item_info(
+            url=url,
+            publicneuro_auth=publicneuro_auth,
+            path=path,
+            timeout=timeout,
+        )
+
+    def _get_item_info(
+        self,
+        url: str,
+        publicneuro_auth: str,
+        path: str,
+        timeout: float | None = None,
+    ) -> dict:
+        # Get the download link for the file
+        result = requests.post(
+            list_url,
+            json={
+                'share_auth': publicneuro_auth,
+                'path': path,
+            },
+            timeout=timeout,
+        )
+
+        if result.status_code != HTTP_200_OK:
+            message = (
+                f'failed to stat {url}, server replied with: '
+                f'{result.status_code} (message: {result.text}).'
+            )
+            raise UrlOperationsAuthenticationError(
+                url=url,
+                message=message,
+                status_code=result.status_code
+            )
+
+        info = result.json()
+        if 'error' in info:
+            message = (
+                f'failed to stat {url}, server replied with: '
+                f'{info["error"]} (message: {info["message"]}).'
+            )
+            raise UrlOperationsRemoteError(
+                url=url,
+                message=message,
+            )
+        assert len(info['files']) == 1
+        return {
+            **{
+                key: info['files'][0][key]
+                for key in ('type', 'path', 'name')
+            },
+            **(
+                {'size': info['files'][0]['size_bytes']}
+                if info['files'][0]['type'] == '-'
+                else {}
+            ),
+        }
+
+    def download(
+        self,
         from_url: str,
         to_path: Path | None,
         *,
@@ -143,6 +210,24 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
             credential=credential,
             timeout=timeout,
         )
+
+        # Get information about the requested item, this is used to distinguish
+        # between files and directories.
+        item_info = self._get_item_info(
+            url=from_url,
+            publicneuro_auth=publicneuro_auth,
+            path=path,
+            timeout=timeout,
+        )
+        if item_info['type'] != '-':
+            message = (
+                f'URL {from_url} does not point to a file, only files are '
+                f'supported.'
+            )
+            raise UrlOperationsRemoteError(
+                url=from_url,
+                message=message,
+            )
 
         # Get the download link for the requested file
         download_url = self._get_download_link(
@@ -167,11 +252,12 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
             content_dir = temporary_dir / 'content'
             content_dir.mkdir()
             return self.extract_to(
-                tarfile_path,
-                content_dir,
-                from_url,
-                to_path,
-                hash,
+                tarfile_path=tarfile_path,
+                content_dir=content_dir,
+                expected_size=item_info.get('size', 0),
+                from_url=from_url,
+                to_path=to_path,
+                hash=hash,
             )
 
     def _authenticate(
@@ -221,6 +307,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         self,
         tarfile_path: Path,
         content_dir: Path,
+        expected_size: int,
         from_url: str,
         to_path: Path,
         hash: list[str] | None = None,  # noqa: A002
@@ -248,7 +335,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         #    return {}
         #  For now, we intend to provide a hash and use file-URL handler's
         #  copy method.
-        return self.copy(file_path, to_path, hash)
+        return self.copy(file_path, to_path, expected_size, hash)
 
     def _get_authentication_info(
         self,
@@ -330,6 +417,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         self,
         source_path: Path,
         dest_path: Path,
+        expected_size: int,  # noqa: A002
         hash: list[str] | None = None,  # noqa: A002
     ) -> dict:
 
@@ -338,10 +426,10 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
             return file_operations._copyfp(  # noqa: SLF001
                 src_fp=src_fp,
                 dst_fp=dst_fp,
-                expected_size=None,
+                expected_size=expected_size,
                 hash=hash,
                 start_log=('Copying %s to %s', source_path, dest_path),
                 update_log=('Copying chunk',),
                 finish_log=('Finished copy',),
-                progress_label='copying',
+                progress_label=f'copying {source_path}',
             )
