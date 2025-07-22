@@ -133,20 +133,6 @@ extra-dependencies = [
     "commitizen",
 ]
 
-[tool.hatch.envs.cz.scripts]
-check-commits = [
-    # check all commit messages since the (before) beginning
-    "cz check --rev-range 4b825dc642cb6eb9a060e54bf8d69288fbee4904..HEAD",
-]
-show-changelog = [
-    # show the would-be changelog on stdout
-    "cz changelog --dry-run",
-]
-bump-version = [
-    # bump version (also tags) and update changelog
-    "cz bump --changelog",
-]
-
 [tool.hatch.envs.codespell]
 description = "spell checking"
 detached = true
@@ -166,7 +152,7 @@ source_pkgs = ["datalad_publicneuro", "tests"]
 branch = true
 parallel = true
 omit = [
-    #  "src/datalad_publicneuro/__about__.py",
+    "src/datalad_publicneuro/__about__.py",
 ]
 data_file = "${COVERAGE_ROOT-.}/.coverage"
 
@@ -192,9 +178,11 @@ exclude = [
 line-length = 88
 indent-width = 4
 target-version = "py311"
+
 [tool.ruff.format]
 # Prefer single quotes over double quotes.
 quote-style = "single"
+
 [tool.ruff.lint.per-file-ignores]
 "**/test_*" = [
     # permit assert statements in tests
@@ -207,24 +195,38 @@ quote-style = "single"
 # permit relative import in subpackage root
 "datalad_publicneuro/*/__init__.py" = ["TID252"]
 
-[tool.commitizen]
-name = "cz_customize"
-tag_format = "v$version"
-version_scheme = "pep440"
-version_provider = "scm"
-changelog_incremental = true
-template = ".changelog.md.j2"
-gpg_sign = true
+#[tool.hatch.envs.cz.scripts]
+#check-commits = [
+#    # check all commit messages since the (before) beginning
+#    "cz check --rev-range 4b825dc642cb6eb9a060e54bf8d69288fbee4904..HEAD",
+#]
+#show-changelog = [
+#    # show the would-be changelog on stdout
+#    "cz changelog --dry-run",
+#]
+#bump-version = [
+#    # bump version (also tags) and update changelog
+#    "cz bump --changelog",
+#]
 
-[tool.commitizen.customize]
-commit_parser = "^((?P<change_type>feat|fix|rf|perf|test|doc|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?(?P<body>.*)?"
-change_type_order = ["BREAKING CHANGE", "feat", "fix", "rf", "perf", "doc", "test"]
-changelog_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
-bump_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
-schema_pattern = "(?s)(ci|doc|feat|fix|perf|rf|style|test|chore|revert|bump)(\\(\\S+\\))?!?:( [^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
+#[tool.commitizen]
+#name = "cz_customize"
+#tag_format = "v$version"
+#version_scheme = "pep440"
+#version_provider = "scm"
+#changelog_incremental = true
+#template = ".changelog.md.j2"
+#gpg_sign = true
 
-[tool.commitizen.customize.bump_map]
-"^\\w+!" = "MAJOR"
-"^BREAKING" = "MAJOR"
-"^feat" = "MINOR"
-"^fix" = "PATCH"
+#[tool.commitizen.customize]
+#commit_parser = "^((?P<change_type>feat|fix|rf|perf|test|doc|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?(?P<body>.*)?"
+#change_type_order = ["BREAKING CHANGE", "feat", "fix", "rf", "perf", "doc", "test"]
+#changelog_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+#bump_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+#schema_pattern = "(?s)(ci|doc|feat|fix|perf|rf|style|test|chore|revert|bump)(\\(\\S+\\))?!?:( [^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
+
+#[tool.commitizen.customize.bump_map]
+#"^\\w+!" = "MAJOR"
+#"^BREAKING" = "MAJOR"
+#"^feat" = "MINOR"
+#"^fix" = "PATCH"
