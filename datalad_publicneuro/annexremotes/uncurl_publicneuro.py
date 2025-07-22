@@ -8,7 +8,6 @@ mechanism that allows to register new URL handlers from extensions with `uncurl`
 """
 
 # The following import will register the Publicneuro URL handler with uncurl
-import datalad_publicneuro.url_operations
 from datalad_next.annexremotes import uncurl
 
 

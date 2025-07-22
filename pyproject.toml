@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 [project]
 name = "datalad-publicneuro"
 dynamic = ["version"]
-description = ''
+description = 'A DataLad extension that simplifies access to PublicnEUro datasets'
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
@@ -44,7 +44,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-# This section is required to allow the direct refernces to the `datalad_core`
+# This section is required to allow the direct references to `datalad_core`
 # in the dependencies section below and in
 # `tool.hatch.envs.hatch-test.extra_dependencies`. Remove the section
 # `tool.hatch.metadata` when `datalad_core` is available on PyPI.
@@ -61,29 +61,21 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/datalad/datalad-remake"
-Documentation = "https://github.com/datalad/datalad-remake#readme"
-Issues = "https://github.com/datalad/datalad-remake/issues"
-Source = "https://github.com/datalad/datalad-remake"
-Changelog = "https://github.com/datalad/datalad-remake/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/datalad/datalad-publicneuro"
+Documentation = "https://github.com/datalad/datalad-publicneuro#readme"
+Issues = "https://github.com/datalad/datalad-publicneuro/issues"
+Source = "https://github.com/datalad/datalad-publicneuro"
+Changelog = "https://github.com/datalad/datalad-publicneuro/blob/main/CHANGELOG.md"
 
 [project.scripts]
 git-annex-remote-uncurl-publicneuro = "datalad_publicneuro.annexremotes.uncurl_publicneuro:main"
 
-[project.entry-points."datalad.extensions"]
-remake = "datalad_publicneuro:command_suite"
-
 [tool.hatch.version]
-source = "vcs"
+path = "datalad_publicneuro/__about__.py"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "datalad_publicneuro/_version.py"
-
-[tool.hatch.envs.hatch-test]
+[tool.hatch.envs.tests]
 default-args = ["datalad_publicneuro"]
 extra-dependencies = [
-    "datalad_next",
-    "datalad_core @ git+https://github.com/datalad/datalad-core",
     "hypothesis",
     "pytest",
     # if you come here, because coverage combination crashed for you
@@ -96,9 +88,9 @@ extra-dependencies = [
 [tool.hatch.envs.hatch-test.env-vars]
 DATALAD_EXTENSIONS_LOAD = "next"
 
-[tool.hatch.envs.tests]
-description = "run tests across Python versions"
-template = "hatch-test"
+#[tool.hatch.envs.tests]
+#description = "run tests across Python versions"
+#template = "hatch-test"
 
 [[tool.hatch.envs.tests.matrix]]
 python = ["3.9", "3.10", "3.11", "3.12"]
@@ -141,20 +133,6 @@ extra-dependencies = [
     "commitizen",
 ]
 
-[tool.hatch.envs.cz.scripts]
-check-commits = [
-    # check all commit messages since the (before) beginning
-    "cz check --rev-range 4b825dc642cb6eb9a060e54bf8d69288fbee4904..HEAD",
-]
-show-changelog = [
-    # show the would-be changelog on stdout
-    "cz changelog --dry-run",
-]
-bump-version = [
-    # bump version (also tags) and update changelog
-    "cz bump --changelog",
-]
-
 [tool.hatch.envs.codespell]
 description = "spell checking"
 detached = true
@@ -174,7 +152,7 @@ source_pkgs = ["datalad_publicneuro", "tests"]
 branch = true
 parallel = true
 omit = [
-    #  "src/datalad_publicneuro/__about__.py",
+    "src/datalad_publicneuro/__about__.py",
 ]
 data_file = "${COVERAGE_ROOT-.}/.coverage"
 
@@ -200,9 +178,11 @@ exclude = [
 line-length = 88
 indent-width = 4
 target-version = "py311"
+
 [tool.ruff.format]
 # Prefer single quotes over double quotes.
 quote-style = "single"
+
 [tool.ruff.lint.per-file-ignores]
 "**/test_*" = [
     # permit assert statements in tests
@@ -215,24 +195,38 @@ quote-style = "single"
 # permit relative import in subpackage root
 "datalad_publicneuro/*/__init__.py" = ["TID252"]
 
-[tool.commitizen]
-name = "cz_customize"
-tag_format = "v$version"
-version_scheme = "pep440"
-version_provider = "scm"
-changelog_incremental = true
-template = ".changelog.md.j2"
-gpg_sign = true
+#[tool.hatch.envs.cz.scripts]
+#check-commits = [
+#    # check all commit messages since the (before) beginning
+#    "cz check --rev-range 4b825dc642cb6eb9a060e54bf8d69288fbee4904..HEAD",
+#]
+#show-changelog = [
+#    # show the would-be changelog on stdout
+#    "cz changelog --dry-run",
+#]
+#bump-version = [
+#    # bump version (also tags) and update changelog
+#    "cz bump --changelog",
+#]
 
-[tool.commitizen.customize]
-commit_parser = "^((?P<change_type>feat|fix|rf|perf|test|doc|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?(?P<body>.*)?"
-change_type_order = ["BREAKING CHANGE", "feat", "fix", "rf", "perf", "doc", "test"]
-changelog_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
-bump_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
-schema_pattern = "(?s)(ci|doc|feat|fix|perf|rf|style|test|chore|revert|bump)(\\(\\S+\\))?!?:( [^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
+#[tool.commitizen]
+#name = "cz_customize"
+#tag_format = "v$version"
+#version_scheme = "pep440"
+#version_provider = "scm"
+#changelog_incremental = true
+#template = ".changelog.md.j2"
+#gpg_sign = true
 
-[tool.commitizen.customize.bump_map]
-"^\\w+!" = "MAJOR"
-"^BREAKING" = "MAJOR"
-"^feat" = "MINOR"
-"^fix" = "PATCH"
+#[tool.commitizen.customize]
+#commit_parser = "^((?P<change_type>feat|fix|rf|perf|test|doc|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?(?P<body>.*)?"
+#change_type_order = ["BREAKING CHANGE", "feat", "fix", "rf", "perf", "doc", "test"]
+#changelog_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+#bump_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+#schema_pattern = "(?s)(ci|doc|feat|fix|perf|rf|style|test|chore|revert|bump)(\\(\\S+\\))?!?:( [^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
+
+#[tool.commitizen.customize.bump_map]
+#"^\\w+!" = "MAJOR"
+#"^BREAKING" = "MAJOR"
+#"^feat" = "MINOR"
+#"^fix" = "PATCH"

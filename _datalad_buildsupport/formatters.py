@@ -69,9 +69,8 @@ class ManPageFormatter(argparse.HelpFormatter):
         return usage
 
     def _mk_title(self, prog):
-        name_version = "{0} {1}".format(prog, self._version)
-        return '.TH "{0}" "{1}" "{2}" "{3}"\n'.format(
-            prog, self._section, self._today, name_version)
+        name_version = f"{prog} {self._version}"
+        return f'.TH "{prog}" "{self._section}" "{self._today}" "{name_version}"\n'
 
     def _mk_name(self, prog, desc):
         """
@@ -108,7 +107,7 @@ class ManPageFormatter(argparse.HelpFormatter):
 
         footer = []
         for section, value in sections.items():
-            part = ".SH {}\n {}".format(section.upper(), value)
+            part = f".SH {section.upper()}\n {value}"
             footer.append(part)
 
         return '\n'.join(footer)
@@ -183,10 +182,10 @@ class RSTManPageFormatter(ManPageFormatter):
         return txt
 
     def _underline(self, string):
-        return "*{0}*".format(string)
+        return f"*{string}*"
 
     def _bold(self, string):
-        return "**{0}**".format(string)
+        return f"**{string}**"
 
     def _mk_synopsis(self, parser):
         self.add_usage(parser.usage, parser._actions,
@@ -202,7 +201,7 @@ class RSTManPageFormatter(ManPageFormatter):
     def _mk_title(self, prog):
         # and an easy to use reference point
         title = ".. _man_%s:\n\n" % prog.replace(' ', '-')
-        title += "{0}".format(prog)
+        title += f"{prog}"
         title += '\n{0}\n\n'.format('=' * len(prog))
         return title
 
@@ -247,7 +246,7 @@ class RSTManPageFormatter(ManPageFormatter):
         # determine help from format above
         option_sec = formatter.format_help()
 
-        return '\n\nOptions\n-------\n{0}'.format(option_sec)
+        return f'\n\nOptions\n-------\n{option_sec}'
 
     def _format_action(self, action):
         # determine the required width and the entry label
@@ -277,7 +276,7 @@ def cmdline_example_to_rst(src, out=None, ref=None):
     out.write('.. AUTO-GENERATED FILE -- DO NOT EDIT!\n\n')
     if ref:
         # place cross-ref target
-        out.write('.. {0}:\n\n'.format(ref))
+        out.write(f'.. {ref}:\n\n')
 
     # parser status vars
     inexample = False

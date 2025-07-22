@@ -1,23 +1,17 @@
 {
   "creators": [
     {
-      "affiliation": "Edit me!",
-      "name": "Edit me!",
-      "orcid": "Edit me!"
+      "affiliation": "Research Center Jülich",
+      "name": "Christian Mönch",
+      "orcid": "0000-0002-3092-0612"
     },
-    {
-      "affiliation": "Edit me!",
-      "name": "Edit me!",
-      "orcid": "Edit me!"
-    }
   ],
   "keywords": [
     "data management",
     "data distribution",
-    "execution provenance tracking",
     "version control"
   ],
   "access_right": "open",
-  "license": "Edit me!",
+  "license": "MIT",
   "upload_type": "software"
 }
