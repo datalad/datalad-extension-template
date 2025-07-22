@@ -44,6 +44,7 @@ HTTP_200_OK = 200
 
 get_share_link_url = 'https://datacatalog.publicneuro.eu/api/get_share_link/'
 prepare_url = 'https://delphiapp.computerome.dk/project_management/file_management/download/prepare'
+list_url = 'https://delphiapp.computerome.dk/project_management/file_management/list'
 
 encoding_pattern = re.compile('charset="([a-zA-Z0-9-]+)"')
 
@@ -134,39 +135,20 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         hash: list[str] | None = None,     # noqa: A002
         timeout: float | None = None
     ) -> dict:
-        url_parts = urlparse(from_url)
-        if not url_parts.scheme.startswith('publicneuro+'):
-            message = f'URL scheme {url_parts.scheme!r} is not supported by {type(self)}.'
-            raise UrlOperationsRemoteError(
-                url=from_url,
-                message=message,
-            )
 
-        # Get authentication info for the dataset
-        dataset_id = url_parts.netloc
-        auth = PublicNeuroAuth(
-            cfg=self.cfg,
-            dataset_id=dataset_id,
-            credential=credential,
-        )
-        share_auth = self._get_authentication_info(
+        dataset_id, path = self._process_url(from_url)
+        publicneuro_auth = self._authenticate(
             from_url=from_url,
             dataset_id=dataset_id,
-            auth=auth,
+            credential=credential,
             timeout=timeout,
-        )
-
-        # Authentication and authorization succeeded, save the credentials.
-        auth.save_entered_credential(
-            suggested_name='publicneuro',
-            context='PublicnEUro.eu',
         )
 
         # Get the download link for the requested file
         download_url = self._get_download_link(
             from_url=from_url,
-            share_auth=share_auth,
-            path=url_parts.path,
+            share_auth=publicneuro_auth,
+            path=path,
             timeout=timeout,
         )
 
@@ -192,6 +174,49 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
                 hash,
             )
 
+    def _authenticate(
+        self,
+        from_url: str,
+        dataset_id: str,
+        credential: str | None = None,
+        timeout: float | None = None
+    ) -> str:
+        """Authenticate for the dataset `dataset_id` with credential `credential`."""
+        auth = PublicNeuroAuth(
+            cfg=self.cfg,
+            dataset_id=dataset_id,
+            credential=credential,
+        )
+        publicneuro_auth = self._get_authentication_info(
+            from_url=from_url,
+            dataset_id=dataset_id,
+            auth=auth,
+            timeout=timeout,
+        )
+
+        # Authentication and authorization succeeded, save the credentials.
+        auth.save_entered_credential(
+            suggested_name='publicneuro',
+            context='PublicnEUro.eu',
+        )
+        return publicneuro_auth
+
+    def _process_url(
+        self,
+        url: str,
+    ):
+        """Process the URL to extract the dataset ID and path."""
+        url_parts = urlparse(url)
+        if not url_parts.scheme.startswith('publicneuro+'):
+            message = f'URL scheme {url_parts.scheme!r} is not supported by {type(self)}.'
+            raise UrlOperationsRemoteError(
+                url=url,
+                message=message,
+            )
+        dataset_id = url_parts.netloc
+        path = unquote_plus(url_parts.path)
+        return dataset_id, path
+
     def extract_to(
         self,
         tarfile_path: Path,
@@ -201,7 +226,6 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         hash: list[str] | None = None,  # noqa: A002
     ) -> dict:
 
-        # TODO: implement hash calculation
         with tarfile.open(tarfile_path) as tar:
             members = tar.getmembers()
             if len(members) != 1 or members[0].type != b'0':
@@ -227,11 +251,11 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         return self.copy(file_path, to_path, hash)
 
     def _get_authentication_info(
-            self,
-            from_url: str,
-            dataset_id: str,
-            auth: PublicNeuroAuth,
-            timeout: float | None = None
+        self,
+        from_url: str,
+        dataset_id: str,
+        auth: PublicNeuroAuth,
+        timeout: float | None = None
     ):
         result = requests.get(
             get_share_link_url + dataset_id,
