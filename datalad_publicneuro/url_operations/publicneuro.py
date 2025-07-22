@@ -121,10 +121,10 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
 
     def stat(
         self,
-        url: str,  # noqa: ARG002
+        url: str,
         *,
-        credential: str | None = None,  # noqa: ARG002
-        timeout: float | None = None,  # noqa: ARG002
+        credential: str | None = None,
+        timeout: float | None = None,
     ) -> dict:
 
         dataset_id, path = self._process_url(url)
@@ -149,12 +149,13 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         path: str,
         timeout: float | None = None,
     ) -> dict:
-        # Get the download link for the file
+        # The list service lists only elements of directories. Therefore the
+        # information about `item` is found in the listing of `item/..`
         result = requests.post(
             list_url,
             json={
                 'share_auth': publicneuro_auth,
-                'path': path,
+                'path': str(Path(path).parent),
             },
             timeout=timeout,
         )
@@ -180,15 +181,23 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
                 url=url,
                 message=message,
             )
-        assert len(info['files']) == 1
+
+        # Find the requested item in the list of files
+        item = [
+            item
+            for item in info['files']
+            if item['path'] == path
+        ][0]
+
+        # Assemble the result
         return {
             **{
-                key: info['files'][0][key]
+                key: item[key]
                 for key in ('type', 'path', 'name')
             },
             **(
-                {'size': info['files'][0]['size_bytes']}
-                if info['files'][0]['type'] == '-'
+                {'size': item['size_bytes']}
+                if item['type'] == '-'
                 else {}
             ),
         }
@@ -327,7 +336,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
             tar.extract(members[0], path=content_dir, set_attrs=False)
             file_path = content_dir / members[0].name
 
-        # TODO: to implement hash calculation or use _copy from the file-URL
+        # TODO: to implement hash calculation we use _copy from the file-URL
         #  handler. I am not sure about the performance implication of
         #  self.copy() here. If it should be too slow, we could use shutil to
         #  copy the file without hash calculation. This would look like this:
@@ -335,6 +344,9 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         #    return {}
         #  For now, we intend to provide a hash and use file-URL handler's
         #  copy method.
+        #  If we decide to support directory downloads in the future, the
+        #  `self.copy()` method will need to be replaced with `shutil.copy` or
+        #  some other implementation.
         return self.copy(file_path, to_path, expected_size, hash)
 
     def _get_authentication_info(
@@ -417,7 +429,7 @@ class PublicNeuroHttpUrlOperations(HttpUrlOperations):
         self,
         source_path: Path,
         dest_path: Path,
-        expected_size: int,  # noqa: A002
+        expected_size: int,
         hash: list[str] | None = None,  # noqa: A002
     ) -> dict:
 
