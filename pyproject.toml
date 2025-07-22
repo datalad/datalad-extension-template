@@ -5,6 +5,13 @@ requires = [
 ]
 build-backend = "hatchling.build"
 
+# This section is required to allow the direct references to `datalad_core`
+# dependencies section below and in
+# Remove the section `tool.hatch.metadata` when `datalad_core` is available
+# on PyPI.
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project]
 name = "datalad-publicneuro"
 dynamic = ["version"]
@@ -44,20 +51,12 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-# This section is required to allow the direct references to `datalad_core`
-# in the dependencies section below and in
-# `tool.hatch.envs.hatch-test.extra_dependencies`. Remove the section
-# `tool.hatch.metadata` when `datalad_core` is available on PyPI.
-[tool.hatch.metadata]
-allow-direct-references = true
-
 dependencies = [
     "annexremote",
     "datalad",
     "datalad_core @ git+https://github.com/datalad/datalad-core",
     "datalad_next",
     "datasalad",
-    "toml",
 ]
 
 [project.urls]
@@ -76,13 +75,13 @@ path = "datalad_publicneuro/__about__.py"
 [tool.hatch.envs.tests]
 default-args = ["datalad_publicneuro"]
 extra-dependencies = [
+    "coverage",
     "hypothesis",
     "pytest",
     # if you come here, because coverage combination crashed for you
     # run `hatch test --cover` and/or see
     # https://github.com/pypa/hatch/issues/1565#issuecomment-2163773123
     "pytest-cov",
-    "toml",
 ]
 
 [tool.hatch.envs.hatch-test.env-vars]
@@ -101,9 +100,7 @@ run = 'python -m pytest {args}'
 [tool.hatch.envs.types]
 description = "type checking with MyPy"
 extra-dependencies = [
-    "hypothesis",
     "mypy>=1.0.0",
-    "pytest",
 ]
 
 [tool.hatch.envs.types.scripts]
@@ -115,6 +112,8 @@ check = [
 description = "build Sphinx-based docs"
 extra-dependencies = [
     "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx_copybutton",
 ]
 
 [tool.hatch.envs.docs.scripts]
@@ -124,13 +123,6 @@ build = [
 clean = [
     "rm -rf docs/generated",
     "make -C docs clean",
-]
-
-[tool.hatch.envs.cz]
-description = "commit compliance, changelog, and release generation"
-detached = true
-extra-dependencies = [
-    "commitizen",
 ]
 
 [tool.hatch.envs.codespell]
@@ -172,6 +164,7 @@ exclude_lines = [
 [tool.ruff]
 exclude = [
     # sphinx
+    "_datalad_buildsupport",
     "docs",
     "resources/type_stubs",
 ]
@@ -194,6 +187,13 @@ quote-style = "single"
 ]
 # permit relative import in subpackage root
 "datalad_publicneuro/*/__init__.py" = ["TID252"]
+
+#[tool.hatch.envs.cz]
+#description = "commit compliance, changelog, and release generation"
+#detached = true
+#extra-dependencies = [
+#    "commitizen",
+#]
 
 #[tool.hatch.envs.cz.scripts]
 #check-commits = [
