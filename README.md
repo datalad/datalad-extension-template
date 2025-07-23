@@ -31,7 +31,8 @@ The following command adds a reference to a file in a PublicnEUro dataset and do
 > git annex addurl --file README.txt publicneuro+https://PN000001/README.txt
 ```
 
-The command will prompt for credentials if no credential are available yet. After successful authentication, the file will be downloaded and added to the annex.
+The command will prompt for credentials if no credentials are available yet.
+After successful authentication, the file will be downloaded and added to the annex.
 Valid credentials will be stored in DataLad's credential store and automatically used for subsequent `addurl`-commands.
 
 
