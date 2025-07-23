@@ -5,13 +5,6 @@ requires = [
 ]
 build-backend = "hatchling.build"
 
-# This section is required to allow the direct references to `datalad_core`
-# dependencies section below and in
-# Remove the section `tool.hatch.metadata` when `datalad_core` is available
-# on PyPI.
-[tool.hatch.metadata]
-allow-direct-references = true
-
 [project]
 name = "datalad-publicneuro"
 dynamic = ["version"]
@@ -54,7 +47,6 @@ classifiers = [
 dependencies = [
     "annexremote",
     "datalad",
-    "datalad_core @ git+https://github.com/datalad/datalad-core",
     "datalad_next",
     "datasalad",
 ]
