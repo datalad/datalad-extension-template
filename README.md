@@ -38,5 +38,4 @@ Valid credentials will be stored in DataLad's credential store and automatically
 
 # Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) if you are interested in internals or
-contributing to the project.
+PRs are welcome! Please open an issue or a pull request if you find a bug or have a feature request.
