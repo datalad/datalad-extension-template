@@ -80,7 +80,7 @@ class PublicNeuroAuth(DataladAuth):
         if 'www-authenticate' not in r.headers:
             r.headers['www-authenticate'] = (
                 'Basic '
-                f'realm="datacatalog.publicneuro.eu/{self.dataset_id}", '
+                f'realm="{self.dataset_id}", '
                 'charset="UTF-8"'
             )
             self.credential_encoding = 'utf-8'
