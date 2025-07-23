@@ -104,18 +104,18 @@ environment:
 # only run the CI if there are code or tooling changes
 only_commits:
   files:
-    - datalad_remake/
+    - datalad_publicneuro/
     - tools/
     - pyproject.toml
     - .appveyor.yml
 
 
 ## tests need specific hostnames to be available
-## note, this is insufficient on MacOS, and needs to be reflected
+## note, this is not enough on MacOS, and needs to be reflected
 ## in the SSH config too
 #hosts:
 #  datalad-test-sshd: 127.0.0.1
-#  # same, but for datalad-remake implementations
+#  # same, but for datalad-publicneuro implementations
 #  datalad-test: 127.0.0.1
 
 
