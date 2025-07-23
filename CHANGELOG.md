@@ -1,3 +1,15 @@
+# 0.0.4 (2025-07-23)
+
+## Bug fixes
+
+- Add a `command_suite` to prevent error messagens when DataLad parses the extension.
+
+## Changed
+
+- The authentication realm was shortened.
+  It now consists of the PublicnEUro dataset ID.
+
+
 # 0.0.3 (2025-07-23)
 
 ## New features
