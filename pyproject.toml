@@ -1,2 +1,9 @@
 [build-system]
 requires = ["setuptools >= 59.0.0", "wheel"]
+
+[tool.codespell]
+# Ref: https://github.com/codespell-project/codespell#using-a-config-file
+skip = '.venv,venvs,.git,build,*.egg-info,*.lock,.asv,.mypy_cache,.tox,fixtures,_version.py,*.pem,versioneer.py'
+check-hidden = true
+# ignore-regex =
+# ignore-words-list = 
